@@ -1,0 +1,39 @@
+server:
+  port: 80
+      
+spring:
+  datasource:
+    username: root
+    password: root
+    url: jdbc:mysql://localhost:3306/mytest?characterEncoding=UTF8&amp&useSSL=true&zeroDateTimeBehavior=convertToNull
+    driver-class-name: com.mysql.jdbc.Driver
+#    hikari:
+#      auto-commit: true
+#      maximum-pool-size: 10
+#      minimum-idle: 5
+  thymeleaf:
+    cache: false
+  redis:
+    host: 192.168.235.129
+    password: demo123
+    port: 6379
+    database: 0
+    jedis:
+      pool:
+        max-active: 10
+  ldap:
+    urls:
+    - ldap://localhost:389
+    base: dc=micmiu,dc=com
+    password: secret
+    username: cn=Manager,dc=micmiu,dc=com
+sso-server:
+  data-config:
+    db-index: 1
+    expires: 420
+  exclude-urls: /heartbeat,/verify,/logout,/dologin,/validateCode,.js,.ico
+  login-path: /login
+logging:
+  config: classpath:log/log4j2-dev.yaml
+   
+   

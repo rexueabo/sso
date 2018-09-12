@@ -1,0 +1,26 @@
+server:
+  port: 9030
+spring:
+  thymeleaf:
+    cache: false
+  redis:
+    host: 192.168.235.129
+    password: demo123
+    port: 6379
+    database: 0
+    jedis:
+      pool:
+        max-active: 10
+sso:
+  client:
+    exclude-urls: /test/setCookie
+#    logout-url: http://www.zhuliang2.test.com:9010/logout
+#    system-name: client-1
+#    verify-token-url: http://www.test.com/verify/ticket
+    redirect-url: http://www.zhuliang.com:9030/test/
+    sso-login-url: http://www.test.com/login
+#    exclude-urls: /logout
+#    logout-url: http://localhost:9003/logout
+#    system-name: client-2
+#    verify-token-url: http://www.test.com/verify/bafs
+#    logout-servlet-url: /logout

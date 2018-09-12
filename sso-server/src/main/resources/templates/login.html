@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html  xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="UTF-8">
+<script th:src="@{/js/jquery-3.3.1.min.js}"></script>
+<script th:src="@{/js/jquery-form-min.js}"></script>
+<title>欢迎登陆</title>
+</head>
+<body>
+<form  method="post" id = "form">
+    <table>
+      <tr>
+        <td>
+                               用户名:<input name="username">
+        </td>
+      </tr>
+      <tr>
+        <td>
+                               密码:<input name="password">
+        </td>
+      <input name="redirectUrl" th:value="${redirectUrl}" type="hidden">
+      </tr>
+      <tr>
+        <td>
+        验证码:<input name="code">
+        </td>
+        <td>
+         <img id="imgObj" alt="验证码" th:src="@{/validateCode}"  onclick="javascript:changeImg()"/>  
+         <a href="#" onclick="javascript:changeImg()">换一张</a>  
+        </td>
+      </tr>
+      <tr>
+        <td>
+            <input id = "submit" type="button" value="登录">
+        </td>
+      </tr>
+    </table>
+</form>
+<script th:inline="javascript">
+
+var redirectUrl = [[${redirectUrl}]]
+$("#submit").click(function(){
+	  $('#form').ajaxSubmit({  
+	   url: '/dologin',  
+	   type: 'post',  
+	   success: function (data) {  
+	     if(data.code == 10200){
+	        window.location.href = redirectUrl + "?ticket=" + data.data.ticket;
+	     }else{
+	    	 changeImg();
+	        alert(data.message)
+	     }
+	   },  
+	     clearForm: false,//禁止清楚表单  
+	     resetForm: false //禁止重置表单  
+	});  
+});
+
+//刷新图片  
+function changeImg() {  
+    var imgSrc = $("#imgObj");  
+    var src = imgSrc.attr("src");  
+    imgSrc.attr("src", changeUrl(src));  
+}  
+//为了使每次生成图片不一致，即不让浏览器读缓存，所以需要加上时间戳  
+function changeUrl(url) {  
+    var timestamp = (new Date()).valueOf();  
+    var index = url.indexOf("?",url);  
+    if (index > 0) {  
+        url = url.substring(0, index);  
+    }  
+    if ((url.indexOf("&") >= 0)) {  
+        url = url + "&timestamp=" + timestamp;  
+    } else {  
+        url = url + "?timestamp=" + timestamp;  
+    }  
+    return url;
+}  
+</script>
+</body>
+</html>

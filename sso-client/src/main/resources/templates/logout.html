@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="UTF-8">
+<title>登出测试</title>
+<script th:src="@{/jquery-3.3.1.min.js}"></script>
+</head>
+<body>
+  <h1>欢迎您</h1>
+  <a href="http://www.test.com/logout?redirectUrl=http://www.zhuliang2.test.com:9010/test/"> 登出</a>
+  <li id="aaaa"  th:href="@{/test11}">测试</li>
+  <script th:inline="javascript">
+	var a=document.getElementById("aaaa");
+	a.onclick=function(){
+		$.ajax({
+			  type: 'POST',
+			  url: "/test",
+			//  dataType:"jsonp",
+			  success: function(data){
+				  if(10200 == data.code){
+				   alert(data.message);
+				  }else{
+					  //访问失败重定向到登录界面
+					 window.location.href = JSON.parse(data).data.ssoLoginUrl;
+				  }
+			  },
+			  error: function(data){
+				  alert(data.message)
+			  }
+			});
+	}
+  </script>
+</body>
+</html>
