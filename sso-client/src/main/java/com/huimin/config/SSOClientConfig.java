@@ -1,89 +1,70 @@
 package com.huimin.config;
 
-import org.springframework.boot.context.properties.ConfigurationProperties;
+import javax.servlet.Filter;
 
-@ConfigurationProperties(prefix = "sso.client")
-public class SSOClientConfig {
-	private String redirectUrl;
-	private String verifyTokenUrl;
-	private String systemName;
-	private String logoutUrl;
-	private String excludeUrls;
-	private String ssoLoginUrl;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.web.servlet.FilterRegistrationBean;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Import;
+import org.springframework.data.redis.connection.RedisConnectionFactory;
+import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+import org.springframework.web.filter.CorsFilter;
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
-	private Boolean isHeartbeat;
-	private String heartbeartUrl;
-	private Long heartbeatTime;
-	public String getRedirectUrl() {
-		return redirectUrl;
+import com.huimin.data.SessionManager;
+import com.huimin.data.RedisSessionManager;
+import com.huimin.filter.LoginFilter;
+
+@Configuration
+@Import(value = SSOClientConfigProperties.class)
+public class SSOClientConfig implements WebMvcConfigurer {
+
+	@Autowired
+	private SSOClientConfigProperties ssoClientConfig;
+
+	@Bean
+	public CorsFilter corsFilter() {
+		UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+		CorsConfiguration corsConfiguration = new CorsConfiguration();
+		corsConfiguration.addAllowedOrigin("*");
+		corsConfiguration.addAllowedHeader("*");
+		corsConfiguration.addAllowedMethod("*");
+		source.registerCorsConfiguration("/**", corsConfiguration);
+		return new CorsFilter(source);
 	}
 
-	public void setRedirectUrl(String redirectUrl) {
-		this.redirectUrl = redirectUrl;
+	@Bean
+	public FilterRegistrationBean<Filter> logoutfilterRegistration() {
+		FilterRegistrationBean<Filter> registrationBean = new FilterRegistrationBean<>();
+		LoginFilter loginFilter = new LoginFilter();
+		// FABSLoginFilter loginFilter = new FABSLoginFilter();
+		loginFilter.setSsoClientConfig(ssoClientConfig);
+		//loginFilter.setDataRepository(dataRepository());
+		registrationBean.setFilter(loginFilter);
+		registrationBean.setOrder(2);
+		registrationBean.addUrlPatterns("*");
+		return registrationBean;
 	}
 
-	public String getVerifyTokenUrl() {
-		return verifyTokenUrl;
+	@Bean
+	public FilterRegistrationBean<Filter> corsfilterRegistration() {
+		FilterRegistrationBean<Filter> registrationBean = new FilterRegistrationBean<>();
+		registrationBean.setFilter(corsFilter());
+		registrationBean.setOrder(1);
+		return registrationBean;
 	}
-
-	public void setVerifyTokenUrl(String verifyTokenUrl) {
-		this.verifyTokenUrl = verifyTokenUrl;
+	@Bean
+	public RedisTemplate<String, Object> redisTemplate(RedisConnectionFactory connectionFactory){
+		RedisTemplate<String, Object> redisTemplate = new RedisTemplate<>();
+		redisTemplate.setConnectionFactory(connectionFactory);
+		return redisTemplate;
 	}
-
-	public String getSystemName() {
-		return systemName;
+	@Bean
+	public SessionManager dataRepository(RedisTemplate<String, Object> redisTemplate) {
+		//DefaultDataRepository dataRepository = new DefaultDataRepository();
+		return new RedisSessionManager(redisTemplate);
 	}
-
-	public void setSystemName(String systemName) {
-		this.systemName = systemName;
-	}
-
-	public String getLogoutUrl() {
-		return logoutUrl;
-	}
-
-	public void setLogoutUrl(String logoutUrl) {
-		this.logoutUrl = logoutUrl;
-	}
-
-	public String getExcludeUrls() {
-		return excludeUrls;
-	}
-
-	public void setExcludeUrls(String excludeUrls) {
-		this.excludeUrls = excludeUrls;
-	}
-
-	public String getSsoLoginUrl() {
-		return ssoLoginUrl;
-	}
-
-	public void setSsoLoginUrl(String ssoLoginUrl) {
-		this.ssoLoginUrl = ssoLoginUrl;
-	}
-
-	public Boolean getIsHeartbeat() {
-		return isHeartbeat;
-	}
-
-	public void setIsHeartbeat(Boolean isHeartbeat) {
-		this.isHeartbeat = isHeartbeat;
-	}
-
-	public String getHeartbeartUrl() {
-		return heartbeartUrl;
-	}
-
-	public void setHeartbeartUrl(String heartbeartUrl) {
-		this.heartbeartUrl = heartbeartUrl;
-	}
-
-	public Long getHeartbeatTime() {
-		return heartbeatTime;
-	}
-
-	public void setHeartbeatTime(Long heartbeatTime) {
-		this.heartbeatTime = heartbeatTime;
-	}
-	
 }

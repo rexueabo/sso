@@ -20,7 +20,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import com.huimin.config.SSOServerPropertise;
-import com.huimin.data.DataRepository;
+import com.huimin.data.SessionManager;
 import com.huimin.entity.Ticket;
 import com.huimin.session.SsoSession;
 import com.huimin.session.SsoSessionUtil;
@@ -36,7 +36,7 @@ public class LoginFilter implements Filter {
 	private List<String> excludeUrls = new ArrayList<>();
 	private String loginPath;
 	@Autowired
-	private DataRepository dataRepository;
+	private SessionManager dataRepository;
 
 	@Override
 	public void init(FilterConfig filterConfig) throws ServletException {

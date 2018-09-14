@@ -8,7 +8,7 @@ import org.springframework.context.ApplicationListener;
 import org.springframework.context.event.ContextClosedEvent;
 import org.springframework.stereotype.Component;
 
-import com.huimin.data.DataRepository;
+import com.huimin.data.SessionManager;
 import com.huimin.util.DateUtil;
 import com.huimin.util.LogUtil;
 
@@ -17,7 +17,7 @@ public class ContextClosedListener implements ApplicationListener<ApplicationEve
 
 	private LogUtil logger = LogUtil.logger(ContextClosedListener.class);
 	@Autowired
-	private DataRepository dataRepository;
+	private SessionManager dataRepository;
 	@Override
 	public void onApplicationEvent(ApplicationEvent event) {
          if (event instanceof ContextClosedEvent) {

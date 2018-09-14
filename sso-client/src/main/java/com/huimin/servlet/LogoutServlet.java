@@ -10,7 +10,7 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.commons.lang3.StringUtils;
 
 import com.alibaba.fastjson.JSON;
-import com.huimin.data.DataRepository;
+import com.huimin.data.SessionManager;
 import com.huimin.util.Constant;
 import com.huimin.util.Response;
 
@@ -25,7 +25,7 @@ public class LogoutServlet extends HttpServlet{
 
 	private static final long serialVersionUID = 1L;
 
-	private DataRepository dataRepository;
+	private SessionManager dataRepository;
 	
 	@Override
 	protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
@@ -50,11 +50,11 @@ public class LogoutServlet extends HttpServlet{
 		}
 	}
 
-	public DataRepository getDataRepository() {
+	public SessionManager getDataRepository() {
 		return dataRepository;
 	}
 
-	public void setDataRepository(DataRepository dataRepository) {
+	public void setDataRepository(SessionManager dataRepository) {
 		this.dataRepository = dataRepository;
 	}
 	

@@ -20,20 +20,16 @@ public class JWTUtil {
      * @return
      * @throws Exception
      */
-    public static  String sign(String id, String subject, long ttlMillis)throws Exception {
+    public static  String sign(Map<String,Object> claims, long ttlMillis)throws Exception {
 			SignatureAlgorithm signatureAlgorithm = SignatureAlgorithm.HS256; //指定签名的时候使用的签名算法，也就是header那部分，jjwt已经将这部分内容封装好了。
 			long nowMillis = System.currentTimeMillis();//生成JWT的时间
 			Date now = new Date(nowMillis);
-			Map<String,Object> claims = new HashMap<String,Object>();//创建payload的私有声明（根据特定的业务需要添加，如果要拿这个做验证，一般是需要和jwt的接收方提前沟通好验证方式的）
-			claims.put("uid", "DSSFAWDWADAS...");
-			claims.put("user_name", "admin");
-			claims.put("nick_name","DASDA121");
 			//下面就是在为payload添加各种标准声明和私有声明了
 			JwtBuilder builder = Jwts.builder() 
 					.setClaims(claims)          
-			        .setId(id)                 
+			     //   .setId(id)                 
 			        .setIssuedAt(now)           
-			        .setSubject(subject)        
+			     //   .setSubject(subject)        
 			        .signWith(signatureAlgorithm, SECERT);
 			if (ttlMillis >= 0) {
 			    long expMillis = nowMillis + ttlMillis;
@@ -57,7 +53,9 @@ public class JWTUtil {
     }
     
     public static void main(String[] args) throws Exception {
-		String sign = sign("111", "hhhh", 10000L);
+    	Map<String,Object> claims = new HashMap<>();
+    	claims.put("111", "hhh");
+		String sign = sign(claims, 10000L);
 		System.out.println(sign);
 //		try {
 //			Thread.currentThread().sleep(15);

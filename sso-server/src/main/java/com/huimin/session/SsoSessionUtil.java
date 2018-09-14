@@ -7,7 +7,7 @@ import javax.servlet.http.HttpServletResponse;
 import org.springframework.context.ApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
 
-import com.huimin.data.DataRepository;
+import com.huimin.data.SessionManager;
 import com.huimin.util.CookieUtil;
 import com.huimin.util.TicketUtil;
 
@@ -16,7 +16,7 @@ public class SsoSessionUtil {
 	private SsoSessionUtil() {
 	}
 
-	private static DataRepository dataRepository;
+	private static SessionManager dataRepository;
 
 	public static SsoSession getSsoSession(HttpServletRequest request, HttpServletResponse response) {
 		Cookie loginCookie = CookieUtil.getLoginCookie(request);
@@ -42,11 +42,11 @@ public class SsoSessionUtil {
 		return session;
 	}
 
-	private static DataRepository dataRepository(HttpServletRequest request) {
+	private static SessionManager dataRepository(HttpServletRequest request) {
 		if (dataRepository == null) {
 			ApplicationContext applicationContext = WebApplicationContextUtils
 					.getWebApplicationContext(request.getServletContext());
-			dataRepository = applicationContext.getBean(DataRepository.class);
+			dataRepository = applicationContext.getBean(SessionManager.class);
 		}
 		return dataRepository;
 	}

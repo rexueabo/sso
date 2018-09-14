@@ -2,7 +2,9 @@ package com.huimin.controller;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -17,12 +19,13 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.huimin.authentication.Authentication;
-import com.huimin.data.DataRepository;
+import com.huimin.data.SessionManager;
 import com.huimin.entity.Subject;
 import com.huimin.entity.Ticket;
 import com.huimin.session.SsoSession;
 import com.huimin.session.SsoSessionUtil;
 import com.huimin.util.Constant;
+import com.huimin.util.JWTUtil;
 import com.huimin.util.LogUtil;
 import com.huimin.util.Response;
 import com.huimin.util.TicketUtil;
@@ -34,7 +37,7 @@ public class LoginController {
 	private LogUtil logger = LogUtil.logger(LoginController.class);
 
 	@Autowired
-	private DataRepository dataRepository;
+	private SessionManager dataRepository;
 	@Autowired
 	private Authentication authentication;
 
@@ -105,6 +108,24 @@ public class LoginController {
 		ssoSession.addAttribute(Constant.VALIDATE_CODE, code);
 		dataRepository.set(ssoSession);
 		validateCode.write(response.getOutputStream());
+	}
+
+	@PostMapping("/dologinJwt")
+	@ResponseBody
+	public Response loginJwt(@RequestParam String username, @RequestParam String password,
+			 @RequestParam String code) throws IOException {
+		try {
+			boolean authenticate = authentication.authenticate(username, password);
+			if (authenticate) {
+				 Map<String,Object> claims = new HashMap<>();
+				 claims.put("username", username);
+				return Response.ok().addData("token", JWTUtil.sign(claims, 2 * 60 * 60 * 1000)).build();
+			}
+			return Response.error().setMessage("用户名或密码错误").build();
+		} catch (Exception e) {
+			logger.error(e);
+			return Response.error().setMessage("认证失败").build();
+		}
 	}
 
 }

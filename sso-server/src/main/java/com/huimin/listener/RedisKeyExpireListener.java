@@ -10,8 +10,8 @@ import org.springframework.data.redis.listener.RedisMessageListenerContainer;
 import org.springframework.data.redis.serializer.RedisSerializer;
 import org.springframework.stereotype.Service;
 
-import com.huimin.data.DataRepository;
-import com.huimin.data.RedisDataRepository;
+import com.huimin.data.SessionManager;
+import com.huimin.data.RedisSessionManager;
 import com.huimin.util.LogoutUtil;
 
 @Service
@@ -20,14 +20,14 @@ public class RedisKeyExpireListener implements MessageListener, InitializingBean
 	    RedisMessageListenerContainer listenerContainer;
 	 
 	 @Autowired
-	 private DataRepository dataRepository;
+	 private SessionManager dataRepository;
 	 private  RedisSerializer<?> keySerializer;
-	 RedisDataRepository redisDataRepository;
+	 RedisSessionManager redisDataRepository;
 
 	@Override
 	public void afterPropertiesSet() throws Exception {
-		if (dataRepository instanceof RedisDataRepository) {
-			redisDataRepository = (RedisDataRepository) dataRepository;
+		if (dataRepository instanceof RedisSessionManager) {
+			redisDataRepository = (RedisSessionManager) dataRepository;
 	     	RedisTemplate<String, Object> redisTemplate = redisDataRepository.getRedisTemplate();
 		    keySerializer = redisTemplate.getKeySerializer();
 	     	listenerContainer.addMessageListener(this,new PatternTopic("__keyevent@"+ redisDataRepository.getDbIndex() +"__:expired"));  
@@ -38,8 +38,8 @@ public class RedisKeyExpireListener implements MessageListener, InitializingBean
 	@Override
 	public void onMessage(Message message, byte[] pattern) {
 		 String key = (String) keySerializer.deserialize(message.getBody());
-		 if (key.startsWith(DataRepository.SSO_SERVER_PRIFIX)) {
-			 LogoutUtil.logout(key.substring(DataRepository.SSO_SERVER_PRIFIX.length()), redisDataRepository.getLogoutUrls());
+		 if (key.startsWith(SessionManager.SSO_SERVER_PRIFIX)) {
+			 LogoutUtil.logout(key.substring(SessionManager.SSO_SERVER_PRIFIX.length()), redisDataRepository.getLogoutUrls());
 		}
 	}
 

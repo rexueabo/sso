@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.huimin.data.DataRepository;
+import com.huimin.data.SessionManager;
 import com.huimin.entity.Subject;
 import com.huimin.entity.Ticket;
 import com.huimin.session.SsoSession;
@@ -23,7 +23,7 @@ import com.huimin.util.TicketUtil;
 public class HeartbeatController {
 
 	@Autowired
-	private DataRepository dataRepository;
+	private SessionManager dataRepository;
 	private LogUtil logger = LogUtil.logger(VerifyController.class);
 
 	@PostMapping

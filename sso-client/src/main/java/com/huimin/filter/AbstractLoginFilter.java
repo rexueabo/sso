@@ -24,10 +24,10 @@ import org.springframework.web.context.support.WebApplicationContextUtils;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
-import com.huimin.config.SSOClientConfig;
-import com.huimin.data.DataRepository;
-import com.huimin.data.DefaultDataRepository;
-import com.huimin.data.RedisDataRepository;
+import com.huimin.config.SSOClientConfigProperties;
+import com.huimin.data.SessionManager;
+import com.huimin.data.DefaultSessionManager;
+import com.huimin.data.RedisSessionManager;
 import com.huimin.entity.HeartBeat;
 import com.huimin.entity.Subject;
 import com.huimin.session.SsoSession;
@@ -46,13 +46,13 @@ public abstract class AbstractLoginFilter implements Filter {
 	protected String redirectUrl;
 	protected String logoutUrl;
 	protected List<String> excludeUrls = new ArrayList<String>();
-	protected DataRepository dataRepository;
+	protected SessionManager dataRepository;
 	protected String path;
 	protected boolean isHeartbeat = true;
 	protected long heartbeatTime = 5 * 60;// 默认5分钟
 	protected String heartbeatUrl;// 心跳url
 	protected ExecutorService executorService;
-	protected SSOClientConfig ssoClientConfig;
+	protected SSOClientConfigProperties ssoClientConfig;
 	protected LogUtil logger = LogUtil.logger(getClass());
 	@Override
 	public void init(FilterConfig filterConfig) throws ServletException {
@@ -113,12 +113,12 @@ public abstract class AbstractLoginFilter implements Filter {
 
 			if (dataRepository == null) {
 				ApplicationContext ac = WebApplicationContextUtils.getWebApplicationContext(filterConfig.getServletContext());
-				dataRepository = ac.getBean(DataRepository.class);
+				dataRepository = ac.getBean(SessionManager.class);
 				if (dataRepository == null) {
-					dataRepository = new DefaultDataRepository();
+					dataRepository = new DefaultSessionManager();
 				}
-				if (dataRepository instanceof RedisDataRepository) {
-					((RedisDataRepository) dataRepository).setClientPrefix(EncryptUtil.md516(logoutUrl) + "-");
+				if (dataRepository instanceof RedisSessionManager) {
+					((RedisSessionManager) dataRepository).setClientPrefix(EncryptUtil.md516(logoutUrl) + "-");
 				}
 			}
 			URI uri = new URI(logoutUrl);
@@ -130,11 +130,11 @@ public abstract class AbstractLoginFilter implements Filter {
 		}
 	}
 
-	public void setDataRepository(DataRepository dataRepository) {
+	public void setDataRepository(SessionManager dataRepository) {
 		this.dataRepository = dataRepository;
 	};
 
-	public void setSsoClientConfig(SSOClientConfig ssoClientConfig) {
+	public void setSsoClientConfig(SSOClientConfigProperties ssoClientConfig) {
 		this.ssoClientConfig = ssoClientConfig;
 	};
 
